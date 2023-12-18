@@ -2,8 +2,9 @@ import processing.core.PApplet;
 
 /**
  * A program that draws a game with mouse and keyboard input variables and event functions.
- * It features a player controlled with the keyboard and snowflakes that can be clicked with the mouse.
- * Snowflakes disappear when clicked and reduce player lives upon collision.
+ * Snowflakes move faster when the DOWN arrow is pressed and slower when the UP arrow is pressed.
+ * There is a player with three lives, controlled with the keyboard, and snowflakes that can be clicked with the mouse.
+ * Snowflakes disappear when clicked and player lives are reduced upon collision with snowflakes.
  * @author: L. Wong  
  */
 public class Sketch extends PApplet {
@@ -41,7 +42,6 @@ public class Sketch extends PApplet {
    * Called once at the beginning of execution the initial set up values i.e background, stroke, fill etc.
    */
   public void setup() {
-
     // Initialize snowflake positions and blnBallHideStatus array
     for (int i = 0; i < fltSnowY.length; i++) {
       fltSnowY[i] = random(height);
@@ -58,6 +58,7 @@ public class Sketch extends PApplet {
   public void draw() {
     background(50);
 
+    // Draw snowflakes and check for collision
     fill(255);
     for (int i = 0; i < fltSnowY.length; i++) {
       if (!blnBallHideStatus[i]) {
@@ -73,17 +74,18 @@ public class Sketch extends PApplet {
         // Check for collision with player
         fltDistance = dist(fltPlayerX, fltPlayerY, fltSnowX[i], fltSnowY[i]);
         if (fltDistance < 30) {
+          // Player collided with a snowflake, reduce lives and reset player position
           intPlayerLives--;
           fltPlayerX = width / 2;
           fltPlayerY = height - 50;
         }
       }
     }
-
+    // Draw player lives indicator if the player has remaining lives
     if (intPlayerLives > 0) {
       drawLivesIndicator();
     }
-  
+    // Game over condition 
     if (intPlayerLives <= 0) {
       background(83, 117, 153);
       textSize(32);
@@ -92,6 +94,7 @@ public class Sketch extends PApplet {
       text("Game Over", width / 2, height / 2);
     } 
     else {
+      // Player mvoement based on keyboard input 
       if (blnUp) {
         fltPlayerY--;
       }
@@ -114,13 +117,14 @@ public class Sketch extends PApplet {
   public void mousePressed() {
     for (int i = 0; i < fltSnowX.length; i++) {
       try {
-        float d = dist(mouseX, mouseY, fltSnowX[i], fltSnowY[i]);
-        if (d < 15 && !blnBallHideStatus[i]) { 
+        // Check if the mouse click is on a snowflake and hide it 
+        fltDistance = dist(mouseX, mouseY, fltSnowX[i], fltSnowY[i]);
+        if (fltDistance < 15 && !blnBallHideStatus[i]) { 
           blnBallHideStatus[i] = true;
         }
       } 
       catch (ArrayIndexOutOfBoundsException e) {
-
+      // Catch anny ArrayInexOutOfBoundsException 
       }
     }
   }
@@ -130,13 +134,14 @@ public class Sketch extends PApplet {
    * Handles keyboard input for controlling the player and adjusting snowflake speed.
    */
   public void keyPressed() {
-    if (keyCode == UP) {
+    if (keyCode == UP) { 
       fltSnowSpeed -= 0.1;
     } 
     else if (keyCode == DOWN) {
       fltSnowSpeed += 0.1;
     }
 
+    // Control player movement with ASDW keys
     if (key == 'w') {
       blnUp = true;
     } 
@@ -155,6 +160,7 @@ public class Sketch extends PApplet {
    * Called when a key is released. Handles keyboard input for controlling the player.
    */
   public void keyReleased() {
+    // Release player movement based on key release 
     if (key == 'w') {
       blnUp = false;
     } 
